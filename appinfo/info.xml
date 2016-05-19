@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<info>
+	<id>twofactor_email</id>
+	<name>Two Factor Email Provider</name>
+	<description>An Two-Factor-Auth Provider for ownCloud 9.1+</description>
+	<licence>AGPL</licence>
+	<author>Christoph Wurst</author>
+	<version>0.0.1</version>
+	<namespace>TwoFactor_Email</namespace>
+	<category>other</category>
+	<types>
+		<prelogin/>
+		<authentication/>
+	</types>
+
+	<two-factor-providers>
+		<provider>OCA\TwoFactor_Email\Provider\TwoFactorEmailProvider</provider>
+	</two-factor-providers>
+
+	<dependencies>
+		<owncloud min-version="9.1" max-version="9.1" />
+	</dependencies>
+</info>
