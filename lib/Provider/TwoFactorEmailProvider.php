@@ -81,12 +81,12 @@ class TwoFactorEmailProvider implements IProvider {
 	}
 
 	/**
-	 * Decides whether 2FA is enforced for the given user
+	 * Decides whether 2FA is enabled for the given user
 	 *
 	 * @param IUser $user
 	 * @return boolean
 	 */
-	public function isTwoFactorAuthEnforcedForUser(IUser $user) {
+	public function isTwoFactorAuthEnabledForUser(IUser $user) {
 		// 2FA is enforced for all users
 		return true;
 	}
