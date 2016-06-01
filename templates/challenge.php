@@ -6,6 +6,7 @@ script('twofactor_email', 'challenge');
 ?>
 
 <form method="POST">
+	<input type="hidden" name="redirect_url" value="<?php p($_['redirect_url']); ?>">
 	<input type="text" name="challenge" required="required">
 	<input type="submit" class="button" value="Verify">
 </form>
