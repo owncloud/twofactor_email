@@ -22,11 +22,31 @@
 
 namespace OCA\TwoFactor_Email\Provider;
 
+use Base32\Base32;
 use OCP\Authentication\TwoFactorAuth\IProvider;
+use OCP\IConfig;
+use OCP\ISession;
 use OCP\IUser;
 use OCP\Template;
+use Otp\GoogleAuthenticator;
+use Otp\Otp;
 
 class TwoFactorEmailProvider implements IProvider {
+
+	/** @var ISession */
+	private $session;
+	
+	/** @var IConfig */
+	private $config;
+	
+	/**
+	 * @param ISession $session
+	 * @param IConfig $config
+	 */
+	public function __construct(ISession $session, IConfig $config) {
+		$this->session = $session;
+		$this->config = $config;
+	}
 
 	/**
 	 * Get unique identifier of this 2FA provider
@@ -43,7 +63,6 @@ class TwoFactorEmailProvider implements IProvider {
 	 * @return string
 	 */
 	public function getDisplayName() {
-		// TODO: L10N
 		return 'Email';
 	}
 
@@ -53,8 +72,7 @@ class TwoFactorEmailProvider implements IProvider {
 	 * @return string
 	 */
 	public function getDescription() {
-		// TODO: L10N
-		return 'Get a token via e-mail';
+		return 'Authenticate with E-mail';
 	}
 
 	/**
@@ -64,6 +82,23 @@ class TwoFactorEmailProvider implements IProvider {
 	 * @return Template
 	 */
 	public function getTemplate(IUser $user) {
+		$otp = new Otp();
+		$secret = GoogleAuthenticator::generateRandom();
+		$this->session->set('twofactor_email_secret', $secret);
+		$totp = (string)$otp->totp(Base32::decode($secret));
+		$email = $user->getEMailAddress();
+		try {
+			$mailer = \OC::$server->getMailer();
+			$message = $mailer->createMessage();
+			$message->setSubject('Two-step verification code');
+			$message->setTo([$email => $user->getDisplayName()]);
+			$message->setPlainBody($totp);
+			$mailer->send($message);
+		} catch (Exception $e) {
+			$tmpl = new Template('twofactor_email', 'error');
+			return $tmpl;
+		}
+		
 		return new Template('twofactor_email', 'challenge');
 	}
 
@@ -74,10 +109,9 @@ class TwoFactorEmailProvider implements IProvider {
 	 * @param string $challenge
 	 */
 	public function verifyChallenge(IUser $user, $challenge) {
-		if ($challenge === 'passme') {
-			return true;
-		}
-		return false;
+		$otp = new Otp();
+		$secret = $this->session->get('twofactor_email_secret');
+		return $otp->checkTotp(Base32::decode($secret), $challenge);
 	}
 
 	/**
