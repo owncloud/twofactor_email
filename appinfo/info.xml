@@ -4,7 +4,7 @@
 	<name>Two Factor Email Provider</name>
 	<description>An Two-Factor-Auth Provider for ownCloud 9.1+</description>
 	<licence>AGPL</licence>
-	<author>Christoph Wurst</author>
+	<author>Juho Ylikorpi</author>
 	<version>0.0.1</version>
 	<namespace>TwoFactor_Email</namespace>
 	<category>other</category>
